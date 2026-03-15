@@ -33,9 +33,9 @@ public partial class Product
     public virtual Category Category { get; set; } = null!;
     [JsonIgnore]
     public virtual ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
-
+    [JsonIgnore]
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
-
+    [JsonIgnore]
     public virtual ICollection<Referral> Referrals { get; set; } = new List<Referral>();
 
     public virtual Supplier Supplier { get; set; } = null!;
