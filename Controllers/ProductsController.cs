@@ -46,7 +46,7 @@ namespace Mini_E_Commerce.Controllers
         {
             var product = await _productService.UpdateProduct(id, productDto);
 
-            if (product == null)
+            if (!product)
             {
                 return NotFound();
             }
