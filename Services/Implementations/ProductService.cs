@@ -13,9 +13,9 @@ namespace Mini_E_Commerce.Services.Implementations
             _context = context;
         }
 
-        public async Task<ProductDto> CreateProduct(ProductDto productdto)
+        public async Task<ProductDto?> CreateProduct(ProductDto productDto)
         {
-            var categoryExists = await _context.Categories.AnyAsync(c => c.CategoryId == productdto.CategoryId);
+            var categoryExists = await _context.Categories.AnyAsync(c => c.CategoryId == productDto.CategoryId);
 
             if (!categoryExists)
             {
@@ -24,24 +24,24 @@ namespace Mini_E_Commerce.Services.Implementations
 
             var product = new Product
             {
-                ProductName = productdto.ProductName,
-                ProductAlias = productdto.ProductAlias,
-                CategoryId = productdto.CategoryId,
-                UnitDescription = productdto.UnitDescription,
-                UnitPrice = productdto.UnitPrice,
-                Image = productdto.Image,
-                ManufactureDate = productdto.ManufactureDate,
-                Discount = productdto.Discount,
-                ViewCount = productdto.ViewCount,
-                Description = productdto.Description,
-                SupplierId = productdto.SupplierId
+                ProductName = productDto.ProductName,
+                ProductAlias = productDto.ProductAlias,
+                CategoryId = productDto.CategoryId,
+                UnitDescription = productDto.UnitDescription,
+                UnitPrice = productDto.UnitPrice,
+                Image = productDto.Image,
+                ManufactureDate = productDto.ManufactureDate,
+                Discount = productDto.Discount,
+                ViewCount = productDto.ViewCount,
+                Description = productDto.Description,
+                SupplierId = productDto.SupplierId
             };
 
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
-            productdto.ProductId = product.ProductId;
-            return productdto;
+            productDto.ProductId = product.ProductId;
+            return productDto;
         }
 
         public async Task<bool> DeleteProduct(int id)
@@ -60,7 +60,7 @@ namespace Mini_E_Commerce.Services.Implementations
 
         public async Task<IEnumerable<ProductDto>> GetAllProducts()
         {
-            return await _context.Products.Select(p => new ProductDto
+            return await _context.Products.AsNoTracking().Select(p => new ProductDto
             {
                 ProductId = p.ProductId,
                 ProductName = p.ProductName,
@@ -80,8 +80,7 @@ namespace Mini_E_Commerce.Services.Implementations
 
         public async Task<ProductDto?> GetProductById(int id)
         {
-
-            return await _context.Products.Where(p => p.ProductId == id).Select(p => new ProductDto
+            return await _context.Products.AsNoTracking().Select(p => new ProductDto
             {
                 ProductId = p.ProductId,
                 ProductName = p.ProductName,

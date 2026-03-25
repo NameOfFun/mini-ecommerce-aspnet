@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Mini_E_Commerce.Dtos.Category;
 using Mini_E_Commerce.Models;
 using Mini_E_Commerce.Services.Interface;
@@ -68,7 +67,7 @@ namespace Mini_E_Commerce.Services.Implementations
                 CategoryAlias = c.CategoryAlias,
                 Description = c.Description,
                 Image = c.Image
-            }).FirstOrDefaultAsync();
+            }).FirstOrDefaultAsync(c => c.CategoryId == id);
         }
 
         public async Task<bool> UpdateCategory(int id, CategoryDto categoryDto)

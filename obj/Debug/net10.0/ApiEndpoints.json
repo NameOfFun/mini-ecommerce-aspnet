@@ -1,8 +1,8 @@
 [
   {
-    "ContainingType": "Mini_E_Commerce.Controllers.CategoryController",
+    "ContainingType": "Mini_E_Commerce.Controllers.CategoriesController",
     "Method": "GetAllCategory",
-    "RelativePath": "api/Category",
+    "RelativePath": "api/Categories",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -10,9 +10,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Mini_E_Commerce.Controllers.CategoryController",
+    "ContainingType": "Mini_E_Commerce.Controllers.CategoriesController",
     "Method": "CreateCategory",
-    "RelativePath": "api/Category",
+    "RelativePath": "api/Categories",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -26,9 +26,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Mini_E_Commerce.Controllers.CategoryController",
+    "ContainingType": "Mini_E_Commerce.Controllers.CategoriesController",
     "Method": "GetCategoryById",
-    "RelativePath": "api/Category/{id}",
+    "RelativePath": "api/Categories/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -42,9 +42,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Mini_E_Commerce.Controllers.CategoryController",
+    "ContainingType": "Mini_E_Commerce.Controllers.CategoriesController",
     "Method": "UpdateCategory",
-    "RelativePath": "api/Category/{id}",
+    "RelativePath": "api/Categories/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -63,9 +63,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Mini_E_Commerce.Controllers.CategoryController",
+    "ContainingType": "Mini_E_Commerce.Controllers.CategoriesController",
     "Method": "DeleteCategory",
-    "RelativePath": "api/Category/{id}",
+    "RelativePath": "api/Categories/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -152,6 +152,85 @@
       {
         "Name": "id",
         "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Mini_E_Commerce.Controllers.SuppliersController",
+    "Method": "GetAllSuppliers",
+    "RelativePath": "api/Suppliers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Mini_E_Commerce.Controllers.SuppliersController",
+    "Method": "CreateSupplier",
+    "RelativePath": "api/Suppliers",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "supplierDto",
+        "Type": "Mini_E_Commerce.Dtos.Supplier.SupplierDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Mini_E_Commerce.Controllers.SuppliersController",
+    "Method": "GetSupplierById",
+    "RelativePath": "api/Suppliers/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Mini_E_Commerce.Controllers.SuppliersController",
+    "Method": "UpdateSupplier",
+    "RelativePath": "api/Suppliers/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "supplier",
+        "Type": "Mini_E_Commerce.Dtos.Supplier.SupplierDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Mini_E_Commerce.Controllers.SuppliersController",
+    "Method": "DeleteSupplier",
+    "RelativePath": "api/Suppliers/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
         "IsRequired": true
       }
     ],

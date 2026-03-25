@@ -8,17 +8,17 @@ namespace Mini_E_Commerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
 
-        public CategoryController(ICategoryService categoryService)
+        public CategoriesController(ICategoryService categoryService)
         {
             _categoryService = categoryService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllCategory()
+        public async Task<IActionResult> GetAllCategories()
         {
             var categories = await _categoryService.GetAllCategories();
             return Ok(categories);
@@ -36,9 +36,9 @@ namespace Mini_E_Commerce.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCategory([FromBody] CategoryDto categorDto)
+        public async Task<IActionResult> CreateCategory([FromBody] CategoryDto categoryDto)
         {
-            var createdCategory = await _categoryService.CreateCategory(categorDto);
+            var createdCategory = await _categoryService.CreateCategory(categoryDto);
             return CreatedAtAction(nameof(GetCategoryById), new { id = createdCategory.CategoryId }, createdCategory);
         }
 
@@ -50,7 +50,7 @@ namespace Mini_E_Commerce.Controllers
             {
                 return NotFound();
             }
-            return Ok(result);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
