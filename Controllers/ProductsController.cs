@@ -17,9 +17,9 @@ namespace Mini_E_Commerce.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts()
+        public async Task<IActionResult> GetAllProducts([FromQuery] ProductQueryDto query)
         {
-            var products = await _productService.GetAllProducts();
+            var products = await _productService.GetAllProducts(query);
             return Ok(products);
         }
 

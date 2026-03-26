@@ -18,7 +18,7 @@ namespace Mini_E_Commerce.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllSuppliers()
         {
-            var suppliers = await _supplierService.GetAllSupplier();
+            var suppliers = await _supplierService.GetAllSuppliers();
             return Ok(suppliers);
         }
 

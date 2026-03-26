@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Mini_E_Commerce.Dtos.Common;
 using Mini_E_Commerce.Dtos.Product;
 using Mini_E_Commerce.Models;
 using Mini_E_Commerce.Services.Interface;
@@ -20,7 +21,7 @@ namespace Mini_E_Commerce.Services.Implementations
             if (!categoryExists)
             {
                 throw new Exception("Category not found");
-            } 
+            }
 
             var product = new Product
             {
@@ -58,24 +59,68 @@ namespace Mini_E_Commerce.Services.Implementations
             return true;
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAllProducts()
+        public async Task<PagedResultDto<ProductDto>> GetAllProducts(ProductQueryDto query)
         {
-            return await _context.Products.AsNoTracking().Select(p => new ProductDto
+            // start tu  IQueryabl - chua thuc thi truy van
+            var queryable = _context.Products.AsNoTracking().AsQueryable();
+
+            // Search by name
+            if (!string.IsNullOrEmpty(query.Search))
             {
-                ProductId = p.ProductId,
-                ProductName = p.ProductName,
-                ProductAlias = p.ProductAlias,
-                CategoryId = p.CategoryId,
-                UnitDescription = p.UnitDescription,
-                UnitPrice = p.UnitPrice,
-                Image = p.Image,
-                ManufactureDate = p.ManufactureDate,
-                Discount = p.Discount,
-                ViewCount = p.ViewCount,
-                Description = p.Description,
-                SupplierId = p.SupplierId,
-                CategoryName = p.Category.CategoryName
-            }).ToListAsync();
+                var keyword = query.Search.Trim().ToLower();
+                queryable = queryable.Where(p => p.ProductName.ToLower().Contains(keyword) || (p.Description != null && p.Description.ToLower().Contains(keyword)));
+            }
+            // Filter by category
+            if(query.CategoryId.HasValue)
+            {
+                queryable = queryable.Where(p => p.CategoryId == query.CategoryId.Value);
+            }
+
+            // Sort
+            queryable = query.SortBy?.ToLower() switch
+            {
+                "price" => query.IsDescending
+                        ? queryable.OrderByDescending(p => p.UnitPrice)
+                        : queryable.OrderBy(p => p.UnitPrice),
+                "date" => query.IsDescending
+                                ? queryable.OrderByDescending(p => p.ManufactureDate)
+                                : queryable.OrderBy(p => p.ManufactureDate),
+                _ => query.IsDescending                           // mặc định sort theo tên
+                                ? queryable.OrderByDescending(p => p.ProductName)
+                                : queryable.OrderBy(p => p.ProductName),
+            };
+
+            // dem tong (truoc khi phan trang)
+            var totalCount = await queryable.CountAsync();
+
+            // Phan trang -- Pagination
+            var items = await queryable
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(p => new ProductDto
+                {
+                    ProductId = p.ProductId,
+                    ProductName = p.ProductName,
+                    ProductAlias = p.ProductAlias,
+                    CategoryId = p.CategoryId,
+                    UnitDescription = p.UnitDescription,
+                    UnitPrice = p.UnitPrice,
+                    Image = p.Image,
+                    ManufactureDate = p.ManufactureDate,
+                    Discount = p.Discount,
+                    ViewCount = p.ViewCount,
+                    Description = p.Description,
+                    SupplierId = p.SupplierId,
+                    CategoryName = p.Category.CategoryName
+                }).ToListAsync();
+
+            return new PagedResultDto<ProductDto>
+            {
+                Data = items,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount
+            };
         }
 
         public async Task<ProductDto?> GetProductById(int id)
