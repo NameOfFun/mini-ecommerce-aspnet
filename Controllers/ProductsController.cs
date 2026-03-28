@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mini_E_Commerce.Dtos.Product;
 using Mini_E_Commerce.Services.Interface;
@@ -35,6 +36,7 @@ namespace Mini_E_Commerce.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDto productDto)
         {
             var product = await _productService.CreateProduct(productDto);
@@ -42,6 +44,7 @@ namespace Mini_E_Commerce.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductDto productDto)
         {
             var product = await _productService.UpdateProduct(id, productDto);
@@ -54,6 +57,7 @@ namespace Mini_E_Commerce.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var result = await _productService.DeleteProduct(id);

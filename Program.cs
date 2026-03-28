@@ -1,52 +1,74 @@
-
+using Scalar.AspNetCore;         // ← thêm using này
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Mini_E_Commerce.Models;
 using Mini_E_Commerce.Services.Implementations;
 using Mini_E_Commerce.Services.Interface;
+using System.Text;
 
-namespace Mini_E_Commerce
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddOpenApi();   // ← giữ nguyên
+
+// DbContext
+builder.Services.AddDbContext<EcommerceMiniContext>(opt =>
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
+
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
+
+// Identity
+builder.Services.AddIdentity<AppUser, IdentityRole>(opt =>
 {
-    public class Program
+    opt.Password.RequireDigit           = true;
+    opt.Password.RequiredLength         = 6;
+    opt.Password.RequireUppercase       = false;
+    opt.Password.RequireNonAlphanumeric = false;
+})
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
+
+// JWT
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+builder.Services.AddAuthentication(opt =>
+{
+    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(opt =>
+{
+    opt.TokenValidationParameters = new TokenValidationParameters
     {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+        ValidateIssuer           = true,
+        ValidateAudience         = true,
+        ValidateLifetime         = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer              = jwtSettings["Issuer"],
+        ValidAudience            = jwtSettings["Audience"],
+        IssuerSigningKey         = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!))
+    };
+});
 
-            // Add services to the container.
+// DI
+builder.Services.AddScoped<IProductService,  ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IAuthService,     AuthService>();
 
-            builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+var app = builder.Build();
 
-            builder.Services.AddSwaggerGen();
-
-            builder.Services.AddDbContext<EcommerceMiniContext>(opt =>
-            {
-                opt.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn"));
-            });
-
-            builder.Services.AddScoped<IProductService, ProductService>();
-            builder.Services.AddScoped<ICategoryService, CategoryService>();
-            builder.Services.AddScoped<ISupplierService, SupplierService>();
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.MapOpenApi();
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-
-            app.MapControllers();
-
-            app.Run();
-        }
-    }
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();  // ← thay thế UseSwagger + UseSwaggerUI
 }
+
+app.UseHttpsRedirection();
+app.UseAuthentication();          // ← PHẢI trước UseAuthorization
+app.UseAuthorization();
+app.MapControllers();
+app.Run();

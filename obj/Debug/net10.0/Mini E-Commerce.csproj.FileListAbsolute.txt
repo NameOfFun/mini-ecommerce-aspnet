@@ -97,9 +97,6 @@ D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\bin\Debug\net10.0\Microso
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\bin\Debug\net10.0\Microsoft.SqlServer.Server.dll
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\bin\Debug\net10.0\Mono.TextTemplating.dll
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\bin\Debug\net10.0\Newtonsoft.Json.dll
-D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\bin\Debug\net10.0\Swashbuckle.AspNetCore.Swagger.dll
-D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerGen.dll
-D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\bin\Debug\net10.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\bin\Debug\net10.0\System.ClientModel.dll
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\bin\Debug\net10.0\System.CodeDom.dll
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\bin\Debug\net10.0\System.Composition.AttributedModel.dll
@@ -209,10 +206,13 @@ D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\obj\Debug\net10.0\staticw
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\obj\Debug\net10.0\staticwebassets.development.json
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\obj\Debug\net10.0\staticwebassets.build.endpoints.json
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\obj\Debug\net10.0\swae.build.ex.cache
-D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\obj\Debug\net10.0\Mini E-C.F0135D1D.Up2Date
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\obj\Debug\net10.0\Mini E-Commerce.dll
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\obj\Debug\net10.0\refint\Mini E-Commerce.dll
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\obj\Debug\net10.0\Mini E-Commerce.pdb
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\obj\Debug\net10.0\Mini E-Commerce.genruntimeconfig.cache
 D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\obj\Debug\net10.0\ref\Mini E-Commerce.dll
+D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\bin\Debug\net10.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\bin\Debug\net10.0\Scalar.AspNetCore.dll
+D:\Ki9\Job App Project\Mini E-Commerce\Mini E-Commerce\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
