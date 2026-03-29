@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Mini_E_Commerce.Dtos.Auths;
+using Mini_E_Commerce.Models;
 using Mini_E_Commerce.Services.Interface;
 
 namespace Mini_E_Commerce.Controllers
@@ -10,11 +12,19 @@ namespace Mini_E_Commerce.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        public AuthController(IAuthService authService)
+        private readonly UserManager<AppUser> _userManager;
+        private readonly IConfiguration _config;
+        //public AuthController(IAuthService authService)
+        //{
+        //    _authService = authService;
+        //}
+
+        public AuthController(IAuthService authService, UserManager<AppUser> userManager, IConfiguration config)
         {
             _authService = authService;
+            _userManager = userManager;
+            _config = config;
         }
-
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
@@ -34,6 +44,26 @@ namespace Mini_E_Commerce.Controllers
             }
 
             return Ok(result);
+        }
+
+        [HttpPost("create-admin")]
+        public async Task<IActionResult> CreateAdmin([FromBody] RegisterDto dto)
+        {
+            var user = new AppUser
+            {
+                UserName = dto.Email,
+                Email = dto.Email,
+                FullName = dto.FullName,
+            };
+
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+            await _userManager.AddToRoleAsync(user, "Admin");
+            return Ok("Admin created");
+
         }
     }
 }

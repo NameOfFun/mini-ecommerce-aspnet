@@ -29,34 +29,45 @@ namespace Mini_E_Commerce.Services.Implementations
             return GenerationToken(user);
         }
 
-        public async Task<AuthResponseDto?> Register(RegisterDto registerDto)
-        {
-            var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
-            if (existingUser != null) return null;
+        //public async Task<AuthResponseDto?> Register(RegisterDto registerDto)
+        //{
+        //    var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
+        //    if (existingUser != null) return null;
 
-            var user = new AppUser
-            {
-                UserName = registerDto.Email,
-                Email = registerDto.Email,
-                FullName = registerDto.FullName,
-            };
+        //    var user = new AppUser
+        //    {
+        //        UserName = registerDto.Email,
+        //        Email = registerDto.Email,
+        //        FullName = registerDto.FullName,
+        //    };
 
-            var result = await _userManager.CreateAsync(user, registerDto.Password);
+        //    var result = await _userManager.CreateAsync(user, registerDto.Password);
 
-            if (!result.Succeeded) return null;
+        //    if (!result.Succeeded) return null;
 
-            return GenerationToken(user);
-        }
+        //    return GenerationToken(user);
+        //}
 
         public async Task<(AuthResponseDto? Dto, IEnumerable<string> Errors)> RegisterError(RegisterDto dto)
         {
             var existingUser = await _userManager.FindByEmailAsync(dto.Email);
             if (existingUser != null)
                 return (null, ["Email already exists."]);
-            var user = new AppUser { UserName = dto.Email, Email = dto.Email, FullName = dto.FullName };
+
+            var user = new AppUser
+            {
+                UserName = dto.Email,
+                Email = dto.Email,
+                FullName = dto.FullName
+            };
+
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
                 return (null, result.Errors.Select(e => e.Description)); // ← lỗi thật
+
+            // Gán role mặc định là "User"
+            await _userManager.AddToRoleAsync(user, "User");
+
             return (GenerationToken(user), []);
         }
 
@@ -66,12 +77,21 @@ namespace Mini_E_Commerce.Services.Implementations
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!));
             var expiration = DateTime.UtcNow.AddHours(double.Parse(jwtSettings["ExpirationHours"]!));
 
+            // lấy roles của user
+            var roles = _userManager.GetRolesAsync(user).Result;
+
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.Id),
                 new(ClaimTypes.Email, user.Email!),
                 new(ClaimTypes.Name, user.FullName ?? ""),
             };
+
+            // thêm claims cho roles
+            foreach(var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],

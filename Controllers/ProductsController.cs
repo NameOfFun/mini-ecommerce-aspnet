@@ -18,6 +18,7 @@ namespace Mini_E_Commerce.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllProducts([FromQuery] ProductQueryDto query)
         {
             var products = await _productService.GetAllProducts(query);
@@ -25,6 +26,7 @@ namespace Mini_E_Commerce.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetProductById(int id)
         {
             var product = await _productService.GetProductById(id);
@@ -36,7 +38,7 @@ namespace Mini_E_Commerce.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDto productDto)
         {
             var product = await _productService.CreateProduct(productDto);
@@ -44,7 +46,7 @@ namespace Mini_E_Commerce.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductDto productDto)
         {
             var product = await _productService.UpdateProduct(id, productDto);
@@ -57,7 +59,7 @@ namespace Mini_E_Commerce.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var result = await _productService.DeleteProduct(id);

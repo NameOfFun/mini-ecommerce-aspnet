@@ -1,4 +1,4 @@
-using Scalar.AspNetCore;         // ← thêm using này
+using Scalar.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -23,9 +23,9 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 // Identity
 builder.Services.AddIdentity<AppUser, IdentityRole>(opt =>
 {
-    opt.Password.RequireDigit           = true;
-    opt.Password.RequiredLength         = 6;
-    opt.Password.RequireUppercase       = false;
+    opt.Password.RequireDigit = true;
+    opt.Password.RequiredLength = 6;
+    opt.Password.RequireUppercase = false;
     opt.Password.RequireNonAlphanumeric = false;
 })
 .AddEntityFrameworkStores<AppDbContext>()
@@ -36,28 +36,28 @@ var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 builder.Services.AddAuthentication(opt =>
 {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    opt.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(opt =>
 {
     opt.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer           = true,
-        ValidateAudience         = true,
-        ValidateLifetime         = true,
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer              = jwtSettings["Issuer"],
-        ValidAudience            = jwtSettings["Audience"],
-        IssuerSigningKey         = new SymmetricSecurityKey(
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!))
     };
 });
 
 // DI
-builder.Services.AddScoped<IProductService,  ProductService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
-builder.Services.AddScoped<IAuthService,     AuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
@@ -67,6 +67,18 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();  // ← thay thế UseSwagger + UseSwaggerUI
 }
 
+// Seed roles vào DB
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    string[] roles = ["Admin", "User"];
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
+    }
+}
 app.UseHttpsRedirection();
 app.UseAuthentication();          // ← PHẢI trước UseAuthorization
 app.UseAuthorization();
