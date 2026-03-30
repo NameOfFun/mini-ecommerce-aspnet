@@ -9,13 +9,13 @@ public partial class Favorite
 
     public int? ProductId { get; set; }
 
-    public string? CustomerId { get; set; }
-
     public DateTime? SelectedDate { get; set; }
 
     public string? Description { get; set; }
 
-    public virtual Customer? Customer { get; set; }
+    public string? UserId { get; set; }
 
+    public virtual AppUser? User { get; set; }
+    
     public virtual Product? Product { get; set; }
 }

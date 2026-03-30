@@ -19,8 +19,6 @@ public partial class EcommerceMiniContext : DbContext
 
     public virtual DbSet<Category> Categories { get; set; }
 
-    public virtual DbSet<Customer> Customers { get; set; }
-
     public virtual DbSet<Department> Departments { get; set; }
 
     public virtual DbSet<Employee> Employees { get; set; }
@@ -50,6 +48,8 @@ public partial class EcommerceMiniContext : DbContext
     public virtual DbSet<VOrderDetail> VOrderDetails { get; set; }
 
     public virtual DbSet<WebPage> WebPages { get; set; }
+    public virtual DbSet<Cart> Carts { get; set; }
+    public virtual DbSet<CartItem> CartItems { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -90,27 +90,6 @@ public partial class EcommerceMiniContext : DbContext
             entity.Property(e => e.CategoryAlias).HasMaxLength(50);
             entity.Property(e => e.CategoryName).HasMaxLength(50);
             entity.Property(e => e.Image).HasMaxLength(50);
-        });
-
-        modelBuilder.Entity<Customer>(entity =>
-        {
-            entity.Property(e => e.CustomerId)
-                .HasMaxLength(20)
-                .HasColumnName("CustomerID");
-            entity.Property(e => e.Address).HasMaxLength(60);
-            entity.Property(e => e.DateOfBirth)
-                .HasDefaultValueSql("(getdate())", "DF_Customers_DateOfBirth")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Email).HasMaxLength(50);
-            entity.Property(e => e.FullName).HasMaxLength(50);
-            entity.Property(e => e.Image)
-                .HasMaxLength(50)
-                .HasDefaultValue("Photo.gif", "DF_Customers_Image");
-            entity.Property(e => e.Password).HasMaxLength(50);
-            entity.Property(e => e.Phone).HasMaxLength(24);
-            entity.Property(e => e.RandomKey)
-                .HasMaxLength(50)
-                .IsUnicode(false);
         });
 
         modelBuilder.Entity<Department>(entity =>
@@ -156,17 +135,17 @@ public partial class EcommerceMiniContext : DbContext
         modelBuilder.Entity<Favorite>(entity =>
         {
             entity.Property(e => e.FavoriteId).HasColumnName("FavoriteID");
-            entity.Property(e => e.CustomerId)
-                .HasMaxLength(20)
-                .HasColumnName("CustomerID");
+            entity.Property(e => e.UserId)
+                .HasMaxLength(450)
+                .HasColumnName("UserID");
             entity.Property(e => e.Description).HasMaxLength(255);
             entity.Property(e => e.ProductId).HasColumnName("ProductID");
             entity.Property(e => e.SelectedDate).HasColumnType("datetime");
 
-            entity.HasOne(d => d.Customer).WithMany(p => p.Favorites)
-                .HasForeignKey(d => d.CustomerId)
+            entity.HasOne(d => d.User).WithMany()
+                .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK_Favorites_Customers");
+                .HasConstraintName("FK_Favorites_AspNetUsers");
 
             entity.HasOne(d => d.Product).WithMany(p => p.Favorites)
                 .HasForeignKey(d => d.ProductId)
@@ -195,9 +174,9 @@ public partial class EcommerceMiniContext : DbContext
         {
             entity.Property(e => e.OrderId).HasColumnName("OrderID");
             entity.Property(e => e.Address).HasMaxLength(60);
-            entity.Property(e => e.CustomerId)
-                .HasMaxLength(20)
-                .HasColumnName("CustomerID");
+            entity.Property(e => e.UserId)
+                .HasMaxLength(450)
+                .HasColumnName("UserID");
             entity.Property(e => e.EmployeeId)
                 .HasMaxLength(50)
                 .HasColumnName("EmployeeID");
@@ -220,9 +199,9 @@ public partial class EcommerceMiniContext : DbContext
                 .HasDefaultValue("Airline", "DF_Orders_ShippingMethod");
             entity.Property(e => e.StatusId).HasColumnName("StatusID");
 
-            entity.HasOne(d => d.Customer).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK_Orders_Customers");
+            entity.HasOne(d => d.User).WithMany()
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_Orders_AspNetUsers");
 
             entity.HasOne(d => d.Employee).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.EmployeeId)
@@ -296,6 +275,7 @@ public partial class EcommerceMiniContext : DbContext
                 .HasColumnName("SupplierID");
             entity.Property(e => e.UnitDescription).HasMaxLength(50);
             entity.Property(e => e.UnitPrice).HasDefaultValue(0.0, "DF_Products_UnitPrice");
+            entity.Property(e => e.Stock).HasDefaultValue(0);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)
@@ -305,15 +285,51 @@ public partial class EcommerceMiniContext : DbContext
                 .HasForeignKey(d => d.SupplierId)
                 .HasConstraintName("FK_Products_Suppliers");
         });
+        modelBuilder.Entity<Cart>(entity =>
+        {
+            entity.Property(e => e.CartId).HasColumnName("CartID");
+            entity.Property(e => e.UserId).HasMaxLength(450);
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+
+            entity.HasIndex(e => e.UserId).IsUnique();
+
+            entity.HasOne(d => d.User)
+                .WithOne()
+                .HasForeignKey<Cart>(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_Carts_AspNetUsers");
+        });
+
+        modelBuilder.Entity<CartItem>(entity =>
+        {
+            entity.Property(e => e.CartItemId).HasColumnName("CartItemID");
+            entity.Property(e => e.CartId).HasColumnName("CartID");
+            entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+            entity.HasIndex(e => new { e.CartId, e.ProductId }).IsUnique();
+
+            entity.HasOne(d => d.Cart)
+                .WithMany(p => p.CartItems)
+                .HasForeignKey(d => d.CartId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_CartItems_Carts");
+
+            entity.HasOne(d => d.Product)
+                .WithMany()
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CartItems_Products");
+        });
 
         modelBuilder.Entity<Referral>(entity =>
         {
             entity.HasKey(e => e.ReferralId).HasName("PK_Promotions");
 
             entity.Property(e => e.ReferralId).HasColumnName("ReferralID");
-            entity.Property(e => e.CustomerId)
-                .HasMaxLength(20)
-                .HasColumnName("CustomerID");
+            entity.Property(e => e.UserId)
+                .HasMaxLength(450)
+                .HasColumnName("UserID");
             entity.Property(e => e.Email).HasMaxLength(50);
             entity.Property(e => e.FullName).HasMaxLength(50);
             entity.Property(e => e.ProductId).HasColumnName("ProductID");
@@ -321,9 +337,9 @@ public partial class EcommerceMiniContext : DbContext
                 .HasDefaultValueSql("(getdate())", "DF_Referrals_SentDate")
                 .HasColumnType("datetime");
 
-            entity.HasOne(d => d.Customer).WithMany(p => p.Referrals)
-                .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK_Referrals_Customers");
+            entity.HasOne(d => d.User).WithMany()
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_Referrals_AspNetUsers");
 
             entity.HasOne(d => d.Product).WithMany(p => p.Referrals)
                 .HasForeignKey(d => d.ProductId)

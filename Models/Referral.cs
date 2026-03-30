@@ -7,8 +7,6 @@ public partial class Referral
 {
     public int ReferralId { get; set; }
 
-    public string? CustomerId { get; set; }
-
     public int ProductId { get; set; }
 
     public string? FullName { get; set; }
@@ -19,7 +17,9 @@ public partial class Referral
 
     public string? Note { get; set; }
 
-    public virtual Customer? Customer { get; set; }
+    public string? UserId { get; set; }
+
+    public virtual AppUser? User { get; set; }
 
     public virtual Product Product { get; set; } = null!;
 }

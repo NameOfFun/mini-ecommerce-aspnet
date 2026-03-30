@@ -28,7 +28,9 @@ public partial class Product
 
     public string? Description { get; set; }
 
+    public int Stock { get; set; }
     public string SupplierId { get; set; } = null!;
+
     [JsonIgnore]
     public virtual Category Category { get; set; } = null!;
 

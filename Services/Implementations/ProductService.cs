@@ -61,7 +61,7 @@ namespace Mini_E_Commerce.Services.Implementations
 
         public async Task<PagedResultDto<ProductDto>> GetAllProducts(ProductQueryDto query)
         {
-            // start tu  IQueryabl - chua thuc thi truy van
+            // start tu  IQueryabl - chua thuc thi truy van 
             var queryable = _context.Products.AsNoTracking().AsQueryable();
 
             // Search by name
