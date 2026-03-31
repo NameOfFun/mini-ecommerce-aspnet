@@ -11,7 +11,7 @@ using Mini_E_Commerce.Models;
 
 namespace Mini_E_Commerce.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(EcommerceMiniContext))]
     [Migration("20260328161000_AddIdentity")]
     partial class AddIdentity
     {

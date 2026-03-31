@@ -17,9 +17,6 @@ builder.Services.AddOpenApi();   // ← giữ nguyên
 builder.Services.AddDbContext<EcommerceMiniContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
 
-builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
-
 // Identity
 builder.Services.AddIdentity<AppUser, IdentityRole>(opt =>
 {
@@ -28,7 +25,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(opt =>
     opt.Password.RequireUppercase = false;
     opt.Password.RequireNonAlphanumeric = false;
 })
-.AddEntityFrameworkStores<AppDbContext>()
+.AddEntityFrameworkStores<EcommerceMiniContext>()
 .AddDefaultTokenProviders();
 
 // JWT

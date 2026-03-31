@@ -112,6 +112,7 @@ namespace Mini_E_Commerce.Services.Implementations
                     Description = p.Description,
                     SupplierId = p.SupplierId,
                     CategoryName = p.Category.CategoryName
+
                 }).ToListAsync();
 
             return new PagedResultDto<ProductDto>

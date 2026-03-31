@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 
 namespace Mini_E_Commerce.Models;
 
-public partial class EcommerceMiniContext : DbContext
+public partial class EcommerceMiniContext : IdentityDbContext<AppUser>
 {
     public EcommerceMiniContext()
     {

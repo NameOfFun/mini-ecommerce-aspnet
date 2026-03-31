@@ -10,7 +10,7 @@ using Mini_E_Commerce.Models;
 
 namespace Mini_E_Commerce.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(EcommerceMiniContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
