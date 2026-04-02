@@ -48,6 +48,27 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Mini_E_Commerce.Controllers.AuthController",
+    "Method": "ResetPassword",
+    "RelativePath": "api/Auth/reset-password",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "newPassword",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Mini_E_Commerce.Controllers.CategoriesController",
     "Method": "GetAllCategories",
     "RelativePath": "api/Categories",

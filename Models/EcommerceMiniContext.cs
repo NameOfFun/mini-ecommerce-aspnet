@@ -54,6 +54,7 @@ public partial class EcommerceMiniContext : IdentityDbContext<AppUser>
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+
         var ConnectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetConnectionString("MyCnn");
 
         base.OnConfiguring(optionsBuilder);
@@ -62,6 +63,7 @@ public partial class EcommerceMiniContext : IdentityDbContext<AppUser>
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Assignment>(entity =>
         {
             entity.Property(e => e.AssignmentId).HasColumnName("AssignmentID");

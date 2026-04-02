@@ -38,7 +38,7 @@ namespace Mini_E_Commerce.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             var result = await _authService.Login(dto);
-            if(result == null) 
+            if (result == null)
             {
                 return Unauthorized("Login failed. Invalid email or password.");
             }
@@ -64,6 +64,15 @@ namespace Mini_E_Commerce.Controllers
             await _userManager.AddToRoleAsync(user, "Admin");
             return Ok("Admin created");
 
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(string email, string newPassword)
+        {
+            var (response, error) = await _authService.ResetPassWord(email, newPassword);
+            if (response == null)                       
+                return BadRequest(error);
+            return Ok(response);
         }
     }
 }

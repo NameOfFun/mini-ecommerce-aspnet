@@ -71,6 +71,18 @@ namespace Mini_E_Commerce.Services.Implementations
             return (GenerationToken(user), []);
         }
 
+        public async Task<(AuthResponseDto? Dto, string? Error)> ResetPassWord(string email, string newPassword)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) throw new Exception("User not found.");
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+            if (!result.Succeeded) return (null, result.Errors.First().Description);
+
+            return (GenerationToken(user), null);
+        }
         private AuthResponseDto GenerationToken(AppUser user)
         {
             var jwtSettings = _config.GetSection("JwtSettings");

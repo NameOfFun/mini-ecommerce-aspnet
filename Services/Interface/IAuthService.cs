@@ -6,6 +6,7 @@ namespace Mini_E_Commerce.Services.Interface
     {
         //Task<AuthResponseDto?> Register(RegisterDto registerDto);
         Task<(AuthResponseDto? Dto, IEnumerable<string> Errors)> RegisterError(RegisterDto registerDto);
+        Task<(AuthResponseDto? Dto, string? Error)> ResetPassWord(string email, string newPassword);
         Task<AuthResponseDto?> Login(LoginDto loginDto);
     }
 }
