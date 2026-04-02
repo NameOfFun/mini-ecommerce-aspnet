@@ -15,6 +15,54 @@ namespace Mini_E_Commerce.Services.Implementations
 
         public async Task<(bool Success, string Message)> AddToCart(string userId, AddToCartDto dto)
         {
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == dto.ProductId);
+            if(product == null)
+            {
+                return (false, "Product not found");
+            }
+
+            if(product.Stock < dto.Quantity)
+            {
+                return (false, $"Not enough stock. Available: {product.Stock}");
+            }
+
+            var cart = await _context.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if(cart == null)
+            {
+                cart = new Cart
+                {
+                    UserId = userId,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                };
+                _context.Carts.Add(cart);
+                await _context.SaveChangesAsync();
+            }
+
+            var existingCartItem = cart.CartItems.FirstOrDefault(ci => ci.ProductId == dto.ProductId);
+            if(existingCartItem != null)
+            {
+                int newQty = existingCartItem.Quantity + dto.Quantity;
+                if(product.Stock < newQty)
+                {
+                    return (false, $"Not enough stock to update quantity. Available: {product.Stock}");
+                }
+                existingCartItem.Quantity = newQty;
+            }
+            else
+            {
+                cart.CartItems.Add(new CartItem
+                {
+                    ProductId = dto.ProductId,
+                    Quantity = dto.Quantity,
+                    UnitPrice = product.UnitPrice ?? 0,
+                    AddedAt = DateTime.UtcNow,
+                });
+            } 
+
+            cart.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
             return (true, "Add Product successfully");
         }
 
@@ -46,14 +94,51 @@ namespace Mini_E_Commerce.Services.Implementations
             };
         }
 
-        public Task<(bool Success, string Message)> RemoveFromCart(string userId, int cartItemId)
+        public async Task<(bool Success, string Message)> RemoveFromCart(string userId, int cartItemId)
         {
-            throw new NotImplementedException();
+            var cart = _context.Carts.Include(c => c.CartItems).FirstOrDefault(c => c.UserId == userId);
+            if(cart == null)
+            {
+                return (false, "Cart not found");
+            }
+
+            var items = cart.CartItems.FirstOrDefault(ci => ci.CartItemId == cartItemId);
+            if(items == null)
+            {
+                return (false, "Cart item not found");
+            }
+
+            cart.CartItems.Remove(items);
+            cart.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return (true, "Items removed");
         }
 
-        public Task<(bool Success, string Message)> UpdateCartItem(string userId, UpdateCartItemDto dto)
+        public async Task<(bool Success, string Message)> UpdateCartItem(string userId, UpdateCartItemDto dto)
         {
-            throw new NotImplementedException();
+            var cart = await _context.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == userId);
+            if(cart == null)
+            {
+                return (false, "Cart not found");
+            }
+
+            var item = cart.CartItems.FirstOrDefault(ci => ci.CartItemId == dto.CartItemId);
+            if(item == null)
+            {
+                return (false, "Cart item not found");
+            }
+
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == item.ProductId);
+            if(product == null || product.Stock < dto.Quantity)
+            {
+                return (false, "Not enough stock");
+            }
+
+            item.Quantity = dto.Quantity;
+            cart.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return (true, "Cart item updated successfully");
         }
     }
 }
