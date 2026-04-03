@@ -16,19 +16,19 @@ namespace Mini_E_Commerce.Services.Implementations
         public async Task<(bool Success, string Message)> AddToCart(string userId, AddToCartDto dto)
         {
             var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == dto.ProductId);
-            if(product == null)
+            if (product == null)
             {
                 return (false, "Product not found");
             }
 
-            if(product.Stock < dto.Quantity)
+            if (product.Stock < dto.Quantity)
             {
                 return (false, $"Not enough stock. Available: {product.Stock}");
             }
 
             var cart = await _context.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == userId);
 
-            if(cart == null)
+            if (cart == null)
             {
                 cart = new Cart
                 {
@@ -41,10 +41,10 @@ namespace Mini_E_Commerce.Services.Implementations
             }
 
             var existingCartItem = cart.CartItems.FirstOrDefault(ci => ci.ProductId == dto.ProductId);
-            if(existingCartItem != null)
+            if (existingCartItem != null)
             {
                 int newQty = existingCartItem.Quantity + dto.Quantity;
-                if(product.Stock < newQty)
+                if (product.Stock < newQty)
                 {
                     return (false, $"Not enough stock to update quantity. Available: {product.Stock}");
                 }
@@ -59,7 +59,7 @@ namespace Mini_E_Commerce.Services.Implementations
                     UnitPrice = product.UnitPrice ?? 0,
                     AddedAt = DateTime.UtcNow,
                 });
-            } 
+            }
 
             cart.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
@@ -74,7 +74,7 @@ namespace Mini_E_Commerce.Services.Implementations
                     ThenInclude(ci => ci.Product).
                     FirstOrDefaultAsync(u => u.UserId == userId);
 
-            if(cart == null)
+            if (cart == null)
             {
                 return new CartResponseDto();
             }
@@ -90,6 +90,7 @@ namespace Mini_E_Commerce.Services.Implementations
                     Image = ci.Product.Image,
                     Quantity = ci.Quantity,
                     UnitPrice = ci.UnitPrice,
+                    StockAvailable = ci.Product.Stock
                 }).ToList()
             };
         }
@@ -97,13 +98,13 @@ namespace Mini_E_Commerce.Services.Implementations
         public async Task<(bool Success, string Message)> RemoveFromCart(string userId, int cartItemId)
         {
             var cart = _context.Carts.Include(c => c.CartItems).FirstOrDefault(c => c.UserId == userId);
-            if(cart == null)
+            if (cart == null)
             {
                 return (false, "Cart not found");
             }
 
             var items = cart.CartItems.FirstOrDefault(ci => ci.CartItemId == cartItemId);
-            if(items == null)
+            if (items == null)
             {
                 return (false, "Cart item not found");
             }
@@ -118,19 +119,19 @@ namespace Mini_E_Commerce.Services.Implementations
         public async Task<(bool Success, string Message)> UpdateCartItem(string userId, UpdateCartItemDto dto)
         {
             var cart = await _context.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == userId);
-            if(cart == null)
+            if (cart == null)
             {
                 return (false, "Cart not found");
             }
 
             var item = cart.CartItems.FirstOrDefault(ci => ci.CartItemId == dto.CartItemId);
-            if(item == null)
+            if (item == null)
             {
                 return (false, "Cart item not found");
             }
 
             var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == item.ProductId);
-            if(product == null || product.Stock < dto.Quantity)
+            if (product == null || product.Stock < dto.Quantity)
             {
                 return (false, "Not enough stock");
             }
@@ -139,6 +140,50 @@ namespace Mini_E_Commerce.Services.Implementations
             cart.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
             return (true, "Cart item updated successfully");
+        }
+
+        public async Task<List<string>> ValidateCartStock(string userId)
+        {
+            var warning = new List<string>();
+
+            var cart = await _context.Carts.AsNoTracking().Include(c => c.CartItems).ThenInclude(ci => ci.Product).FirstOrDefaultAsync(c => c.UserId == userId);
+            if (cart == null || !cart.CartItems.Any())
+            {
+                return warning;
+            }
+
+            foreach (var item in cart.CartItems)
+            {
+                if (item.Product == null)
+                {
+                    warning.Add($"Product ID {item.ProductId} no longer exists.");
+                    continue;
+                }
+                if (item.Product.Stock == 0)
+                {
+                    warning.Add($"'{item.Product.ProductName}' is out of stock");
+                }
+                else if (item.Quantity > item.Product.Stock)
+                {
+                    warning.Add($"'{item.Product.ProductName}' has only {item.Product.Stock} items left. Please adjust your quantity.");
+                }
+            }
+            return warning;
+        }
+
+        public async Task<bool> ClearCart(string userId)
+        {
+            var cart = await _context.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null)
+            {
+                return false;
+            }
+
+            _context.CartItems.RemoveRange(cart.CartItems);
+            cart.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

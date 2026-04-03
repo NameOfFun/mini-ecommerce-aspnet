@@ -111,8 +111,8 @@ namespace Mini_E_Commerce.Services.Implementations
                     ViewCount = p.ViewCount,
                     Description = p.Description,
                     SupplierId = p.SupplierId,
-                    CategoryName = p.Category.CategoryName
-
+                    CategoryName = p.Category.CategoryName,
+                    Stock = p.Stock,
                 }).ToListAsync();
 
             return new PagedResultDto<ProductDto>

@@ -127,6 +127,16 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Mini_E_Commerce.Controllers.CartController",
+    "Method": "ValidateCart",
+    "RelativePath": "api/Cart/validate-stock",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Mini_E_Commerce.Controllers.CategoriesController",
     "Method": "GetAllCategories",
     "RelativePath": "api/Categories",

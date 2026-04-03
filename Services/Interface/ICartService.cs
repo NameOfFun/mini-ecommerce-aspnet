@@ -5,6 +5,8 @@ namespace Mini_E_Commerce.Services.Interface
     public interface ICartService
     {
         Task<CartResponseDto> GetCart(string userId);
+        Task<List<string>> ValidateCartStock(string userId);
+        Task<bool> ClearCart(string userId);
         Task<(bool Success, string Message)> AddToCart(string userId, AddToCartDto dto);
         Task<(bool Success, string Message)> UpdateCartItem(string userId, UpdateCartItemDto dto);
         Task<(bool Success, string Message)> RemoveFromCart(string userId, int cartItemId);

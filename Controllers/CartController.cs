@@ -55,5 +55,16 @@ namespace Mini_E_Commerce.Controllers
             if (!success) return NotFound(message);
             return Ok(message);
         }
+
+        [HttpGet("validate-stock")]
+        public async Task<IActionResult> ValidateCart()
+        {
+            var warnings = await _cartService.ValidateCartStock(GetUserId());
+            if (!warnings.Any())
+            {
+                return Ok(new {IsValid = true, Message = "Cart is ready for checkout."});
+            }
+            return Ok(new { IsValid = false, Warnings = warnings });
+        }
     }
 }

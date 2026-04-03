@@ -27,5 +27,7 @@
         public string SupplierId { get; set; } = null!;
 
         public string CategoryName { get; set; } = null!;
+
+        public int Stock { get; set; }
     }
 }
