@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Mini_E_Commerce.Dtos.Common;
 using Mini_E_Commerce.Dtos.Order;
 using Mini_E_Commerce.Models;
 using Mini_E_Commerce.Services.Interface;
@@ -121,6 +122,88 @@ namespace Mini_E_Commerce.Services.Implementations
                 await transaction.RollbackAsync();
                 throw;
             }
+        }
+
+        public async Task<IEnumerable<OrderSumaryDto>> GetMyOrders(string userId)
+        {
+            return await _context.Orders.AsNoTracking().Where(o => o.UserId == userId)
+                .Include(o => o.Status).Include(o => o.OrderDetails).OrderByDescending(o => o.OrderDate)
+                .Select(o => new OrderSumaryDto
+                {
+                    OrderId = o.OrderId,
+                    OrderDate = o.OrderDate,
+                    StatusName = o.Status.StatusName,
+                    GrandTotal = o.OrderDetails.Sum(od => od.UnitPrice * od.Quantity * (1 - od.Discount)) + o.ShippingFee,
+                    UserEmail = null
+                }).ToListAsync();
+        }
+
+        public async Task<(OrderResponseDto? Order, string? Error)> GetOrderByIdForUser(string userId, int orderId)
+        {
+            var order = await _context.Orders.AsNoTracking().Include(o => o.Status)
+                .Include(o => o.OrderDetails).ThenInclude(od => od.Product)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId && o.UserId == userId);
+
+            if (order == null) return (null, "Order not found.");
+            return (MapToOrderResponseDto(order), null);
+        }
+
+        private static OrderResponseDto? MapToOrderResponseDto(Order order)
+        {
+            var items = order.OrderDetails.Select(d => new OrderItemResponseDto
+            {
+                ProductId = d.ProductId,
+                ProductName = d.Product.ProductName,
+                Quantity = d.Quantity,
+                UnitPrice = d.UnitPrice,
+                Discount = d.Discount,
+            }).ToList();
+
+            double itemsTotal = order.OrderDetails.Sum(d => d.Quantity * d.UnitPrice * (1 - d.Discount));
+
+            return new OrderResponseDto
+            {
+                OrderId = order.OrderId,
+                StatusName = order.Status.StatusName,
+                OrderDate = order.OrderDate,
+                FullName = order.FullName ?? "",
+                Address = order.Address,
+                PaymentMethod = order.PaymentMethod,
+                ShippingFee = order.ShippingFee,
+                ItemsTotal = itemsTotal,
+                GrandTotal = itemsTotal + order.ShippingFee,
+                Items = items
+            };
+        }
+
+        public async Task<PagedResultDto<OrderSumaryDto>> GetAllOrdersForAdmin(OrderQueryDto query)
+        {
+            var q = _context.Orders.AsNoTracking().Include(o => o.Status)
+                .Include(o => o.User).Include(o => o.OrderDetails).OrderByDescending(o => o.OrderDate);
+
+            var total = await q.CountAsync();
+            var items = await q.Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize).Select(o => new OrderSumaryDto
+                {
+                    OrderId = o.OrderId,
+                    OrderDate = o.OrderDate,
+                    StatusName = o.Status.StatusName,
+                    GrandTotal = o.OrderDetails.Sum(od => od.UnitPrice * od.Quantity * (1 - od.Discount)) + o.ShippingFee,
+                    UserEmail = o.User.Email
+                }).ToListAsync();
+
+            return new PagedResultDto<OrderSumaryDto> { Data = items, Page = query.Page, PageSize = query.PageSize, TotalCount = total };
+        }
+
+        public async Task<(OrderResponseDto? Order, string? Error)> GetOrderByIdForAdmin(int orderId)
+        {
+            var order = await _context.Orders.AsNoTracking()
+                .Include(o => o.Status).Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Product)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+            if (order == null) return (null, "Order not found.");
+            return (MapToOrderResponseDto(order), null);
         }
     }
 }

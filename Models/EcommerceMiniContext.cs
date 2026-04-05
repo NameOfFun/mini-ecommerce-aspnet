@@ -49,18 +49,11 @@ public partial class EcommerceMiniContext : IdentityDbContext<AppUser>
     public virtual DbSet<VOrderDetail> VOrderDetails { get; set; }
 
     public virtual DbSet<WebPage> WebPages { get; set; }
+
     public virtual DbSet<Cart> Carts { get; set; }
+
     public virtual DbSet<CartItem> CartItems { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-
-        var ConnectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetConnectionString("MyCnn");
-
-        base.OnConfiguring(optionsBuilder);
-        optionsBuilder.EnableDetailedErrors().EnableSensitiveDataLogging(); // Chỉ dùng trong development
-        optionsBuilder.UseSqlServer(ConnectionString);
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

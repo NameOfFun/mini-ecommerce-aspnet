@@ -35,7 +35,8 @@ namespace Mini_E_Commerce.Services.Implementations
                 Discount = productDto.Discount,
                 ViewCount = productDto.ViewCount,
                 Description = productDto.Description,
-                SupplierId = productDto.SupplierId
+                SupplierId = productDto.SupplierId,
+                Stock = productDto.Stock,
             };
 
             _context.Products.Add(product);
@@ -140,7 +141,8 @@ namespace Mini_E_Commerce.Services.Implementations
                 ViewCount = p.ViewCount,
                 Description = p.Description,
                 SupplierId = p.SupplierId,
-                CategoryName = p.Category.CategoryName
+                CategoryName = p.Category.CategoryName,
+                Stock = p.Stock,
             }).FirstOrDefaultAsync(p => p.ProductId == id);
         }
 
@@ -164,6 +166,7 @@ namespace Mini_E_Commerce.Services.Implementations
             existingProduct.Discount = product.Discount;
             existingProduct.ViewCount = product.ViewCount;
             existingProduct.ProductAlias = product.ProductAlias;
+            existingProduct.Stock = product.Stock;
 
             await _context.SaveChangesAsync();
             return true;

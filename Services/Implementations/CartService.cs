@@ -84,7 +84,7 @@ namespace Mini_E_Commerce.Services.Implementations
                 CartId = cart.CartId,
                 Items = cart.CartItems.Select(ci => new CartItemResponseDto
                 {
-                    CartItemId = ci.ProductId,
+                    CartItemId = ci.CartItemId,
                     ProductId = ci.ProductId,
                     ProductName = ci.Product.ProductName,
                     Image = ci.Product.Image,
@@ -97,7 +97,7 @@ namespace Mini_E_Commerce.Services.Implementations
 
         public async Task<(bool Success, string Message)> RemoveFromCart(string userId, int cartItemId)
         {
-            var cart = _context.Carts.Include(c => c.CartItems).FirstOrDefault(c => c.UserId == userId);
+            var cart = await _context.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == userId);
             if (cart == null)
             {
                 return (false, "Cart not found");
