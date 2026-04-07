@@ -28,7 +28,7 @@ namespace Mini_E_Commerce.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var (order, error) = await _orderService.GetOrderByIdForAdmin(id);
-            if (order == null) return NotFound( new {message = error});
+            if (order == null) return NotFound(new { message = error });
             return Ok(order);
         }
 

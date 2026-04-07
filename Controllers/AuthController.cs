@@ -70,7 +70,7 @@ namespace Mini_E_Commerce.Controllers
         public async Task<IActionResult> ResetPassword(string email, string newPassword)
         {
             var (response, error) = await _authService.ResetPassWord(email, newPassword);
-            if (response == null)                       
+            if (response == null)
                 return BadRequest(error);
             return Ok(response);
         }

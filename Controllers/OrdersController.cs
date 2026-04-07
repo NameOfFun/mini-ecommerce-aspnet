@@ -30,14 +30,14 @@ namespace Mini_E_Commerce.Controllers
             {
                 return BadRequest(new { message = error });
             }
-            return CreatedAtAction(nameof(GetById), new {id = order.OrderId}, order);
+            return CreatedAtAction(nameof(GetById), new { id = order.OrderId }, order);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var (order, error) = await _orderService.GetOrderByIdForUser(GetUserId(), id);
-            if (order == null) return NotFound(new {message = error});
+            if (order == null) return NotFound(new { message = error });
             return Ok(order);
         }
 

@@ -100,7 +100,7 @@ namespace Mini_E_Commerce.Services.Implementations
             };
 
             // thêm claims cho roles
-            foreach(var role in roles)
+            foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }

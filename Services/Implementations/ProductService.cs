@@ -72,7 +72,7 @@ namespace Mini_E_Commerce.Services.Implementations
                 queryable = queryable.Where(p => p.ProductName.ToLower().Contains(keyword) || (p.Description != null && p.Description.ToLower().Contains(keyword)));
             }
             // Filter by category
-            if(query.CategoryId.HasValue)
+            if (query.CategoryId.HasValue)
             {
                 queryable = queryable.Where(p => p.CategoryId == query.CategoryId.Value);
             }
